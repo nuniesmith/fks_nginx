@@ -2,7 +2,7 @@
 # Generic single-service extractor driven by extraction-map.yml
 # Preserves history only for the service paths, seeds scaffolding & submodules.
 # Usage: ./migration/extract-service.sh <service-name> <mono-root> <out-dir> [--org yourorg] [--remote git@github.com:org/repo.git]
-# Example: ./migration/extract-service.sh fks-api . ./_out --org yourorg --remote git@github.com:yourorg/fks-api.git
+# Example: ./migration/extract-service.sh fks_api . ./_out --org yourorg --remote git@github.com:yourorg/fks_api.git
 set -euo pipefail
 
 SERVICE=${1:-}
@@ -90,7 +90,7 @@ for p in "${paths[@]}"; do
 done
 
 echo "[STEP] Add submodules" >&2
-declare -A MAPSUB=( [python]=fks-shared-python [schema]=fks-shared-schema [scripts]=fks-shared-scripts [docker]=fks-shared-docker [nginx]=fks-shared-nginx [react]=fks-shared-react [rust]=fks-shared-rust [actions]=fks-shared-actions )
+declare -A MAPSUB=( [python]=fks_shared_python [schema]=fks_shared_schema [scripts]=fks_shared_scripts [docker]=fks_shared_docker [nginx]=fks_shared_nginx [react]=fks_shared_react [rust]=fks_shared_rust [actions]=fks_shared_actions )
 for s in "${subs[@]:-}"; do
   [[ -z $s ]] && continue
   repo="${MAPSUB[$s]:-}"

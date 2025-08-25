@@ -1,4 +1,4 @@
-# shared-schema
+# shared_schema
 
 Service-agnostic shared component extracted from monolith paths:
 

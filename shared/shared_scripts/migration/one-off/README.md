@@ -3,26 +3,26 @@ One-off Extraction Utilities
 
 Scripts:
 
-1. extract-fks-api.sh
+1. extract-fks_api.sh
 
    - Purpose: Opinionated, hand-tuned extraction for the API service.
-   - Usage: `./migration/one-off/extract-fks-api.sh MONO_ROOT TARGET_DIR [REMOTE]`
+   - Usage: `./migration/one-off/extract-fks_api.sh MONO_ROOT TARGET_DIR [REMOTE]`
 
 2. extract-service.sh (generic)
 
     - Purpose: Generic single-service extractor parsing `extraction-map.yml` for paths & submodules.
     - Usage:
-       `./migration/extract-service.sh fks-api . ./_out --org yourorg --remote git@github.com:yourorg/fks-api.git`
+       `./migration/extract-service.sh fks_api . ./_out --org yourorg --remote git@github.com:yourorg/fks_api.git`
 
 3. validate-service.sh
 
     - Purpose: Post-extraction smoke test (build / test / minimal security audit).
     - Usage:
-       `./migration/validate-service.sh ./_out/fks-api`
+       `./migration/validate-service.sh ./_out/fks_api`
 
 Recommended Flow (Single Service):
 
-1. Create empty GitHub repository (e.g., fks-api).
+1. Create empty GitHub repository (e.g., fks_api).
 2. Run generic extractor with `--remote` pointing to SSH/HTTPS URL.
 3. Review diff, adjust any import or path edge cases.
 4. Run validation script.

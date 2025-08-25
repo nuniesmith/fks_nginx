@@ -7,7 +7,7 @@ set -euo pipefail
 # Configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-SERVICE_NAME="fks-ssl-manager"
+SERVICE_NAME="fks_ssl-manager"
 INSTALL_PATH="/opt/fks"
 
 # Colors for output
@@ -44,9 +44,9 @@ install_project() {
     chmod +x "$INSTALL_PATH/scripts/"*.sh
     
     # Create log directory
-    mkdir -p /var/log/fks-ssl
-    touch /var/log/fks-ssl-manager.log
-    chmod 644 /var/log/fks-ssl-manager.log
+    mkdir -p /var/log/fks_ssl
+    touch /var/log/fks_ssl-manager.log
+    chmod 644 /var/log/fks_ssl-manager.log
     
     # Set proper ownership
     chown -R root:root "$INSTALL_PATH"
@@ -213,16 +213,16 @@ create_management_scripts() {
     log_info "Creating FKS SSL management scripts..."
     
     # SSL management wrapper
-    cat > "/usr/local/bin/fks-ssl" << EOF
+    cat > "/usr/local/bin/fks_ssl" << EOF
 #!/bin/bash
 # FKS SSL Certificate Management Wrapper
 cd "$INSTALL_PATH"
 exec "$INSTALL_PATH/scripts/ssl-manager.sh" "\$@"
 EOF
-    chmod +x "/usr/local/bin/fks-ssl"
+    chmod +x "/usr/local/bin/fks_ssl"
     
     # Service management wrapper
-    cat > "/usr/local/bin/fks-ssl-service" << EOF
+    cat > "/usr/local/bin/fks_ssl-service" << EOF
 #!/bin/bash
 # FKS SSL Service Management Wrapper
 
@@ -263,11 +263,11 @@ case "\$1" in
         ;;
 esac
 EOF
-    chmod +x "/usr/local/bin/fks-ssl-service"
+    chmod +x "/usr/local/bin/fks_ssl-service"
     
     log_success "Management scripts created"
-    echo "  - fks-ssl: Direct SSL certificate management"
-    echo "  - fks-ssl-service: Systemd service management"
+    echo "  - fks_ssl: Direct SSL certificate management"
+    echo "  - fks_ssl-service: Systemd service management"
 }
 
 # Show completion message
@@ -279,15 +279,15 @@ ${GREEN}🎉 FKS SSL Certificate Management Installation Complete!${NC}
 ${BLUE}Configuration:${NC}
   • Project installed at: $INSTALL_PATH
   • Environment file: $INSTALL_PATH/.env
-  • Logs: /var/log/fks-ssl/manager.log
+  • Logs: /var/log/fks_ssl/manager.log
 
 ${BLUE}Management Commands:${NC}
-  • fks-ssl setup                   - Initial SSL certificate setup
-  • fks-ssl renew                   - Renew certificates manually
-  • fks-ssl status                  - Show certificate status
-  • fks-ssl-service status          - Show systemd service status
-  • fks-ssl-service logs            - View renewal logs
-  • fks-ssl-service run-now         - Run renewal immediately
+  • fks_ssl setup                   - Initial SSL certificate setup
+  • fks_ssl renew                   - Renew certificates manually
+  • fks_ssl status                  - Show certificate status
+  • fks_ssl-service status          - Show systemd service status
+  • fks_ssl-service logs            - View renewal logs
+  • fks_ssl-service run-now         - Run renewal immediately
 
 ${BLUE}Systemd Services:${NC}
   • ${SERVICE_NAME}.service         - Certificate renewal service
@@ -302,8 +302,8 @@ ${BLUE}FKS Domains Managed:${NC}
 ${BLUE}Next Steps:${NC}
   1. Configure your settings in: $INSTALL_PATH/.env
   2. Add Cloudflare credentials for multi-domain certificates
-  3. Run: fks-ssl setup
-  4. Check status: fks-ssl-service status
+  3. Run: fks_ssl setup
+  4. Check status: fks_ssl-service status
 
 ${YELLOW}Timer Schedule:${NC}
   • Automatic renewal checks: 2:30 AM and 2:30 PM daily
@@ -327,8 +327,8 @@ uninstall() {
     systemctl daemon-reload
     
     # Remove management scripts
-    rm -f "/usr/local/bin/fks-ssl"
-    rm -f "/usr/local/bin/fks-ssl-service"
+    rm -f "/usr/local/bin/fks_ssl"
+    rm -f "/usr/local/bin/fks_ssl-service"
     
     # Ask about project directory
     read -p "Remove project directory $INSTALL_PATH? (y/N): " -n 1 -r
