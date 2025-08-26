@@ -2,7 +2,7 @@ services:
   fks_nginx:
     build:
       context: .
-      dockerfile: Dockerfile.simple
+      dockerfile: Dockerfile
     ports:
       - "80:80"
       - "443:443"
