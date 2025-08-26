@@ -29,7 +29,7 @@ if [[ -d fks_ninja ]]; then rsync -a fks_ninja/ ./; rm -rf fks_ninja; fi
 mkdir -p src tests .github/workflows docs
 
 # Add submodules (schema, scripts, actions, docker)
-declare -A MAPSUB=( [schema]=fks_shared_schema [scripts]=fks_shared_scripts [actions]=fks_shared_actions [docker]=fks_shared_docker )
+declare -A MAPSUB=( [schema]=shared_schema [scripts]=shared_scripts [actions]=shared_actions [docker]=shared_docker )
 for s in schema scripts actions docker; do
   url="git@github.com:$ORG/${MAPSUB[$s]}.git"; git submodule add -f "$url" "shared/$s" || true
 done

@@ -30,7 +30,7 @@ Recommended Flow (Single Service):
 
 Notes:
 
-- Import rewrite currently only handles `from fks_shared.` -> `from fks_shared_python.`. Extend as needed.
+- Import rewrite currently only handles `from fks_shared.` -> `from shared_python.`. Extend as needed.
 - Multiple service paths are supported; first-level directories named `fks_*` are flattened.
 - Submodule mapping derives from `submodules:` line in `extraction-map.yml`; ensure names are correct before extraction.
 - For Rust or Web services, build/test steps are scaffolded automatically if config files are present.

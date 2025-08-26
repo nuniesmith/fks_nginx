@@ -34,7 +34,7 @@ if [[ -d fks_web ]]; then rsync -a fks_web/ ./; rm -rf fks_web; fi
 mkdir -p src public .github/workflows docs
 
 # Add submodules (react, nginx, docker, actions, scripts)
-declare -A MAPSUB=( [react]=fks_shared_react [nginx]=fks_shared_nginx [docker]=fks_shared_docker [actions]=fks_shared_actions [scripts]=fks_shared_scripts )
+declare -A MAPSUB=( [react]=shared_react [nginx]=shared_nginx [docker]=shared_docker [actions]=shared_actions [scripts]=shared_scripts )
 for s in react nginx docker actions scripts; do
   url="git@github.com:$ORG/${MAPSUB[$s]}.git"
   git submodule add -f "$url" "shared/$s" || true

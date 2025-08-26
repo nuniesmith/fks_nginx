@@ -90,7 +90,7 @@ for p in "${paths[@]}"; do
 done
 
 echo "[STEP] Add submodules" >&2
-declare -A MAPSUB=( [python]=fks_shared_python [schema]=fks_shared_schema [scripts]=fks_shared_scripts [docker]=fks_shared_docker [nginx]=fks_shared_nginx [react]=fks_shared_react [rust]=fks_shared_rust [actions]=fks_shared_actions )
+declare -A MAPSUB=( [python]=shared_python [schema]=shared_schema [scripts]=shared_scripts [docker]=shared_docker [nginx]=shared_nginx [react]=shared_react [rust]=shared_rust [actions]=shared_actions )
 for s in "${subs[@]:-}"; do
   [[ -z $s ]] && continue
   repo="${MAPSUB[$s]:-}"
@@ -102,7 +102,7 @@ done
 echo "[STEP] Apply Python import rewrite" >&2
 if grep -RIl '^from fks_shared\.' src >/dev/null 2>&1; then
   grep -RIl '^from fks_shared\.' src | while read -r f; do
-    sed -i "s/^from fks_shared\./from fks_shared_python./" "$f" || true
+    sed -i "s/^from fks_shared\./from shared_python./" "$f" || true
   done
 fi
 

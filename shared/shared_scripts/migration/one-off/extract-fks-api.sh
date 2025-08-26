@@ -46,12 +46,12 @@ git checkout -b main || true
 
 echo "[STEP] Add submodules" >&2
 declare -A SUBS=(
-  [python]=git@github.com:$ORG/fks_shared_python.git
-  [schema]=git@github.com:$ORG/fks_shared_schema.git
-  [scripts]=git@github.com:$ORG/fks_shared_scripts.git
-  [docker]=git@github.com:$ORG/fks_shared_docker.git
-  [actions]=git@github.com:$ORG/fks_shared_actions.git
-  [nginx]=git@github.com:$ORG/fks_shared_nginx.git
+  [python]=git@github.com:$ORG/shared_python.git
+  [schema]=git@github.com:$ORG/shared_schema.git
+  [scripts]=git@github.com:$ORG/shared_scripts.git
+  [docker]=git@github.com:$ORG/shared_docker.git
+  [actions]=git@github.com:$ORG/shared_actions.git
+  [nginx]=git@github.com:$ORG/shared_nginx.git
 )
 for name url in "${!SUBS[@]}"; do
   git submodule add -f "${SUBS[$name]}" "shared/$name" || true
@@ -60,7 +60,7 @@ done
 echo "[STEP] Basic Python import rewrites" >&2
 if command -v grep >/dev/null; then
   grep -Rl '^from fks_shared\.' src | while read -r file; do
-    sed -i "s/^from fks_shared\./from fks_shared_python./" "$file" || true
+    sed -i "s/^from fks_shared\./from shared_python./" "$file" || true
   done
 fi
 

@@ -57,7 +57,7 @@ if [[ -f src/model.rs && ! -f src/config.rs ]]; then
 fi
 
 # Add submodules
-declare -A MAPSUB=( [rust]=fks_shared_rust [schema]=fks_shared_schema [scripts]=fks_shared_scripts [actions]=fks_shared_actions [docker]=fks_shared_docker )
+declare -A MAPSUB=( [rust]=shared_rust [schema]=shared_schema [scripts]=shared_scripts [actions]=shared_actions [docker]=shared_docker )
 for s in rust schema scripts actions docker; do
   repo="${MAPSUB[$s]}"
   url="git@github.com:$ORG/$repo.git"

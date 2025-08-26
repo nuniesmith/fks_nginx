@@ -27,9 +27,9 @@ echo "[STEP] Filter history" >&2
 git filter-repo --path fks_worker --force
 if [[ -d fks_worker ]]; then rsync -a fks_worker/ ./; rm -rf fks_worker; fi
 mkdir -p src tests
-declare -A MAPSUB=( [python]=fks_shared_python [schema]=fks_shared_schema [scripts]=fks_shared_scripts [docker]=fks_shared_docker [actions]=fks_shared_actions )
+declare -A MAPSUB=( [python]=shared_python [schema]=shared_schema [scripts]=shared_scripts [docker]=shared_docker [actions]=shared_actions )
 for s in python schema scripts docker actions; do repo="${MAPSUB[$s]}"; url="git@github.com:$ORG/$repo.git"; git submodule add -f "$url" "shared/$s" || true; done
-if grep -RIl '^from fks_shared\.' src >/dev/null 2>&1; then grep -RIl '^from fks_shared\.' src | while read -r f; do sed -i "s/^from fks_shared\./from fks_shared_python./" "$f" || true; done; fi
+if grep -RIl '^from fks_shared\.' src >/dev/null 2>&1; then grep -RIl '^from fks_shared\.' src | while read -r f; do sed -i "s/^from fks_shared\./from shared_python./" "$f" || true; done; fi
 TEMPLATES="$MONO_ROOT/migration/templates"
 mkdir -p .github/workflows docs
 cp "$TEMPLATES/ci-python.yml" .github/workflows/ci.yml
