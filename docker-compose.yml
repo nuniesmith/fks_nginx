@@ -2,7 +2,7 @@ services:
   fks_nginx:
     build:
       context: .
-      dockerfile: shared/shared_docker/templates/nginx.Dockerfile
+      dockerfile: shared/shared_docker/templates/Dockerfile.nginx
     environment:
       TZ: America/Toronto
     ports:
