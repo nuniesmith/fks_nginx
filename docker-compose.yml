@@ -2,18 +2,16 @@ services:
   fks_nginx:
     build:
       context: .
-      dockerfile: shared/shared_docker/templates/Dockerfile.nginx
+      dockerfile: Dockerfile.simple
     environment:
       TZ: America/Toronto
+    user: root
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-      - ./config:/etc/nginx/conf.d
-      - ./logs:/var/log/nginx
-      - ssl_certs:/etc/nginx/certs
     networks: [fks_net]
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://localhost/ || exit 1"]
@@ -28,3 +26,4 @@ volumes:
 networks:
   fks_net:
     name: fks_net
+    external: true
