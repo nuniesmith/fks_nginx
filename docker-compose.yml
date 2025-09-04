@@ -2,9 +2,11 @@ services:
   fks_nginx:
     build:
       context: .
-      dockerfile: Dockerfile.simple
+      dockerfile: Dockerfile
     environment:
       TZ: America/Toronto
+      FKS_DOMAIN_TEST: "fkstrading.test"
+      FKS_DOMAIN_PROD: "fkstrading.xyz"
     user: root
     ports:
       - "80:80"

@@ -1,0 +1,9 @@
+# Data subdomain
+server { listen 80; server_name data.${FKS_DOMAIN_TEST} data.${FKS_DOMAIN_PROD}; return 301 https://$host$request_uri; }
+server {
+  listen 443 ssl http2;
+  server_name data.${FKS_DOMAIN_TEST} data.${FKS_DOMAIN_PROD};
+  include /etc/nginx/snippets/tls_common.conf;
+  include /etc/nginx/snippets/security_headers.conf;
+  location / { proxy_pass http://fks_data_up/; include /etc/nginx/proxy_params; }
+}

@@ -1,0 +1,9 @@
+# Auth subdomain
+server { listen 80; server_name auth.${FKS_DOMAIN_TEST} auth.${FKS_DOMAIN_PROD}; return 301 https://$host$request_uri; }
+server {
+  listen 443 ssl http2;
+  server_name auth.${FKS_DOMAIN_TEST} auth.${FKS_DOMAIN_PROD};
+  include /etc/nginx/snippets/tls_common.conf;
+  include /etc/nginx/snippets/security_headers.conf;
+  location / { limit_req zone=auth_limit burst=10 nodelay; proxy_pass http://fks_auth_up/; include /etc/nginx/proxy_params; }
+}

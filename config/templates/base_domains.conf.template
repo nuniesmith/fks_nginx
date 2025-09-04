@@ -1,0 +1,34 @@
+# Base domain + www redirect to HTTPS, then HTTPS virtual host with path routing
+
+# HTTP redirect
+server {
+  listen 80;
+  server_name ${FKS_DOMAIN_TEST} www.${FKS_DOMAIN_TEST} ${FKS_DOMAIN_PROD} www.${FKS_DOMAIN_PROD};
+  location /health { return 200 'OK'; add_header Content-Type text/plain; }
+  return 301 https://$host$request_uri;
+}
+
+# HTTPS host with path routing
+server {
+  listen 443 ssl http2;
+  server_name ${FKS_DOMAIN_TEST} www.${FKS_DOMAIN_TEST} ${FKS_DOMAIN_PROD} www.${FKS_DOMAIN_PROD};
+
+  include /etc/nginx/snippets/tls_common.conf;
+  include /etc/nginx/snippets/security_headers.conf;
+  add_header Cache-Control "no-cache, no-store, must-revalidate";
+
+  # Static caching override for built assets (adjust extensions as needed)
+  location ~* \.(?:js|css|png|jpg|jpeg|gif|svg|ico|woff2?)$ {
+    add_header Cache-Control "public, max-age=31536000, immutable";
+    try_files $uri @web_root;
+  }
+
+  location @web_root { proxy_pass http://fks_web_up/; include /etc/nginx/proxy_params; }
+
+  location /health { return 200 '{"status":"healthy","domain":"$host"}'; add_header Content-Type application/json; }
+  location /api/    { limit_req zone=api_limit burst=15 nodelay; proxy_pass http://fks_api_up;    include /etc/nginx/proxy_params; proxy_set_header Upgrade $http_upgrade; proxy_set_header Connection $connection_upgrade; }
+  location /data/   { proxy_pass http://fks_data_up/;  include /etc/nginx/proxy_params; }
+  location /engine/ { proxy_pass http://fks_engine_up/;include /etc/nginx/proxy_params; }
+  location /auth/   { proxy_pass http://fks_auth_up/;  include /etc/nginx/proxy_params; }
+  location /        { proxy_pass http://fks_web_up/;   include /etc/nginx/proxy_params; }
+}
