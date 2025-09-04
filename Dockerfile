@@ -7,10 +7,8 @@ FROM shared/nginx:1.27.1-alpine AS final
 COPY config/nginx.conf /etc/nginx/nginx.conf
 COPY config/conf.d/ /etc/nginx/conf.d/
 
-# Copy SSL certificates if they exist
-COPY ssl /etc/nginx/ssl/ 
-
-# Copy static content if it exists  
+# Copy SSL certificates and static content if they exist
+COPY ssl_certs /etc/nginx/ssl/
 COPY html /usr/share/nginx/html/
 
 # Set service-specific environment variables
@@ -27,8 +25,8 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 
 EXPOSE ${SERVICE_PORT}
 
-# Use template's nginx user
-USER appuser
+# Use nginx user from base image
+USER nginx
 
 # Use nginx as the entrypoint
 CMD ["nginx", "-g", "daemon off;"]
