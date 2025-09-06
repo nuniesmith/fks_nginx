@@ -14,7 +14,7 @@ if ! docker image inspect "$BASE_TAG" >/dev/null 2>&1; then
   docker build \
     --build-arg VERSION="$VERSION" \
     -t "$BASE_TAG" \
-    ./shared/shared_nginx
+    ./shared/nginx
 else
   echo "[build] Base image $BASE_TAG already exists (skipping)"
 fi
