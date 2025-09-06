@@ -8,7 +8,9 @@ COPY config/nginx.conf /etc/nginx/nginx.conf
 COPY config/conf.d/ /etc/nginx/conf.d/
 
 # Copy SSL certificates and static content if they exist
-COPY ssl_certs /etc/nginx/ssl/
+# Copy SSL certificates (self-signed dev bundle expected to contain SANs for all local domains)
+# Using /etc/nginx/certs to align with existing fallback default.conf references
+COPY ssl_certs /etc/nginx/certs/
 COPY html /usr/share/nginx/html/
 
 # Set service-specific environment variables
