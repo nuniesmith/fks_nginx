@@ -1,30 +1,32 @@
+version: "3.9"
+
 services:
   # NOTE: Build the base shared image first with scripts/build-all.sh (which tags shared/nginx:1.27.1-alpine)
   fks_nginx:
     build:
       context: .
       dockerfile: Dockerfile
+    user: root
     environment:
       TZ: America/Toronto
-      FKS_DOMAIN_TEST: "fkstrading.test"
-      FKS_DOMAIN_PROD: "fkstrading.xyz"
-    user: root
+      FKS_DOMAIN_TEST: fkstrading.test
+      FKS_DOMAIN_PROD: fkstrading.xyz
+      FKS_ENVIRONMENT: dev
     ports:
       - "80:80"
       - "443:443"
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
-    networks: [fks_net]
+      - ./dev_certs:/etc/nginx/ssl:ro
+    networks:
+      - fks_net
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://localhost/ || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 20s
-
-volumes:
-  ssl_certs:
 
 networks:
   fks_net:
