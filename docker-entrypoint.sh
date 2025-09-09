@@ -21,4 +21,18 @@ done
 echo "[entrypoint] final nginx config:" >&2
 ls -1 "$OUT_DIR" >&2 || true
 
+# Optional: wait briefly for core upstream DNS names to appear on the docker network
+WAIT_HOSTS="fks_api fks_web fks_data fks_auth"
+for h in $WAIT_HOSTS; do
+  for i in 1 2 3 4 5; do
+    if getent hosts "$h" >/dev/null 2>&1; then
+      echo "[entrypoint] resolved $h"; break
+    fi
+    echo "[entrypoint] waiting for $h (attempt $i)"; sleep 1
+  done
+done
+
+# Final syntax test (will now include any dynamically generated conf)
+nginx -t || echo "[entrypoint][warn] final nginx -t reported errors; continuing so container can retry/reload" >&2
+
 exec nginx -g 'daemon off;'

@@ -24,7 +24,7 @@ RUN mkdir -p /etc/nginx/ssl && \
         -out /etc/nginx/ssl/server.crt \
         -subj "/C=US/ST=NA/L=Local/O=FKS/OU=Dev/CN=localhost" >/dev/null 2>&1 || true; \
     fi
-USER nginx
+USER root
 
 # Set service-specific environment variables
 ENV SERVICE_NAME=fks-nginx \
@@ -40,8 +40,9 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 
 EXPOSE ${SERVICE_PORT}
 
-# Use nginx user from base image
+# Copy entrypoint with root perms then drop back to nginx
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod 0755 /docker-entrypoint.sh && chown nginx:nginx /docker-entrypoint.sh
 USER nginx
-
-# Use nginx as the entrypoint
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
+CMD []
