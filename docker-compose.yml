@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nuniesmith/fks:nginx-latest
+    container_name: fks-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # SSL certificates
+      - ./ssl:/etc/nginx/ssl:ro
+      # Logs
+      - ./logs:/var/log/nginx
+      # Static files from Django (if running locally)
+      - ../web/staticfiles:/app/staticfiles:ro
+      # Media files from Django (if running locally)
+      - ../web/media:/app/media:ro
+      # Let's Encrypt certificates (if using certbot)
+      - certbot_data:/etc/letsencrypt:ro
+    networks:
+      - fks-network
+    depends_on:
+      - web
+      - flower
+    environment:
+      - TZ=UTC
+    labels:
+      - "com.fks.service=nginx"
+      - "com.fks.role=reverse-proxy"
+
+  # Optional: Certbot for Let's Encrypt
+  certbot:
+    image: certbot/certbot:latest
+    container_name: fks-certbot
+    volumes:
+      - certbot_data:/etc/letsencrypt
+      - ./ssl:/etc/letsencrypt/ssl:ro
+      - ./logs:/var/log/letsencrypt
+    command: certonly --webroot --webroot-path=/var/www/certbot --email admin@fkstrading.xyz --agree-tos --no-eff-email -d fkstrading.xyz -d www.fkstrading.xyz
+    profiles:
+      - ssl
+
+networks:
+  fks-network:
+    external: true
+    name: fks-network
+
+volumes:
+  certbot_data:
+

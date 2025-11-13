@@ -1,0 +1,9 @@
+*.md
+*.sh
+LICENSE
+logs/
+*.log
+ssl/*.key
+ssl/*.crt
+!ssl/.gitkeep
+
