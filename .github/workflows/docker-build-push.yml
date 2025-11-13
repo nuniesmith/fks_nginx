@@ -25,13 +25,54 @@ jobs:
         run: |
           echo "Testing nginx configuration..."
 
-          # Test nginx configuration - it may fail on upstream resolution in CI
+          # Create dummy SSL certificates for validation (if SSL is configured)
+          # Check if SSL certificates are required in config
+          if grep -q "ssl_certificate" ${{ github.workspace }}/conf.d/*.conf 2>/dev/null; then
+            echo "Creating dummy SSL certificates for validation..."
+            mkdir -p /tmp/nginx-ssl
+            
+            # Create dummy certificate and key files
+            openssl req -x509 -nodes -days 1 -newkey rsa:2048 \
+              -keyout /tmp/nginx-ssl/dummy.key \
+              -out /tmp/nginx-ssl/dummy.crt \
+              -subj "/CN=localhost" >/dev/null 2>&1
+            
+            # Extract all certificate and key paths from config files
+            CERT_PATHS=$(grep -h "ssl_certificate[^_]" ${{ github.workspace }}/conf.d/*.conf 2>/dev/null | grep -v "^#" | sed 's/.*ssl_certificate[[:space:]]*\([^;]*\);.*/\1/' | tr -d ' ' | sort -u)
+            KEY_PATHS=$(grep -h "ssl_certificate_key" ${{ github.workspace }}/conf.d/*.conf 2>/dev/null | grep -v "^#" | sed 's/.*ssl_certificate_key[[:space:]]*\([^;]*\);.*/\1/' | tr -d ' ' | sort -u)
+            
+            # Create certificate files with expected filenames
+            for cert_path in $CERT_PATHS; do
+              if [ -n "$cert_path" ]; then
+                cert_file=$(basename "$cert_path")
+                cp /tmp/nginx-ssl/dummy.crt "/tmp/nginx-ssl/$cert_file" 2>/dev/null || true
+              fi
+            done
+            
+            # Create key files with expected filenames
+            for key_path in $KEY_PATHS; do
+              if [ -n "$key_path" ]; then
+                key_file=$(basename "$key_path")
+                cp /tmp/nginx-ssl/dummy.key "/tmp/nginx-ssl/$key_file" 2>/dev/null || true
+              fi
+            done
+          fi
+
+          # Test nginx configuration
           # Capture both output and exit code
           set +e
-          OUTPUT=$(docker run --rm \
-            -v ${{ github.workspace }}/nginx.conf:/etc/nginx/nginx.conf:ro \
-            -v ${{ github.workspace }}/conf.d:/etc/nginx/conf.d:ro \
-            nginx:alpine nginx -t 2>&1)
+          if [ -d /tmp/nginx-ssl ] && [ "$(ls -A /tmp/nginx-ssl 2>/dev/null)" ]; then
+            OUTPUT=$(docker run --rm \
+              -v ${{ github.workspace }}/nginx.conf:/etc/nginx/nginx.conf:ro \
+              -v ${{ github.workspace }}/conf.d:/etc/nginx/conf.d:ro \
+              -v /tmp/nginx-ssl:/etc/nginx/ssl:ro \
+              nginx:alpine nginx -t 2>&1)
+          else
+            OUTPUT=$(docker run --rm \
+              -v ${{ github.workspace }}/nginx.conf:/etc/nginx/nginx.conf:ro \
+              -v ${{ github.workspace }}/conf.d:/etc/nginx/conf.d:ro \
+              nginx:alpine nginx -t 2>&1)
+          fi
           EXIT_CODE=$?
           set -e
 
@@ -43,26 +84,48 @@ jobs:
             exit 0
           fi
 
-          # If it failed, check if it's only due to upstream resolution
-          if echo "$OUTPUT" | grep -q "host not found in upstream"; then
-            # Check if resolver is configured (upstreams will resolve at runtime)
-            if grep -q "resolver" ${{ github.workspace }}/nginx.conf; then
+          # Check if resolver and zone are configured (for runtime DNS resolution)
+          HAS_RESOLVER=$(grep -q "resolver" ${{ github.workspace }}/nginx.conf && echo "yes" || echo "no")
+          HAS_ZONE=$(grep -q "zone.*backend" ${{ github.workspace }}/nginx.conf && echo "yes" || echo "no")
+          HAS_RESOLVE=$(grep -q "resolve" ${{ github.workspace }}/nginx.conf && echo "yes" || echo "no")
+
+          # If it failed, check if it's only due to upstream resolution issues
+          if echo "$OUTPUT" | grep -qE "(host not found in upstream|could not be resolved)"; then
+            # Check if runtime resolution is properly configured
+            if [ "$HAS_RESOLVER" = "yes" ] && [ "$HAS_ZONE" = "yes" ] && [ "$HAS_RESOLVE" = "yes" ]; then
               echo "✅ Nginx configuration syntax is valid"
               echo "⚠️  Upstream hosts not resolvable in CI (expected - will resolve at runtime via resolver)"
               # Check that there are no other errors (syntax errors, missing files, etc.)
-              if echo "$OUTPUT" | grep -qE "(syntax error|unknown directive|invalid number|duplicate|missing)"; then
+              if echo "$OUTPUT" | grep -qE "(syntax error|unknown directive|invalid number|duplicate|missing|invalid parameter)"; then
                 echo "❌ Found syntax errors in configuration"
                 exit 1
               fi
               exit 0
             else
-              echo "❌ Upstream hosts not found and no resolver configured"
+              echo "❌ Upstream hosts not found but runtime resolution not properly configured"
+              echo "   Resolver configured: $HAS_RESOLVER"
+              echo "   Zone configured: $HAS_ZONE"
+              echo "   Resolve parameter: $HAS_RESOLVE"
               exit 1
             fi
           fi
 
+          # Check for SSL certificate errors
+          if echo "$OUTPUT" | grep -qE "(cannot load certificate|BIO_new_file.*failed)"; then
+            echo "❌ SSL certificate configuration error"
+            echo "   This may indicate the certificate paths don't match"
+            exit 1
+          fi
+
+          # Check for shared memory zone errors (should be fixed now)
+          if echo "$OUTPUT" | grep -q "shared memory"; then
+            echo "❌ Shared memory zone configuration error"
+            exit 1
+          fi
+
           # Any other error is a real configuration problem
           echo "❌ Nginx configuration validation failed"
+          echo "   Exit code: $EXIT_CODE"
           exit 1
 
   build-and-push:
