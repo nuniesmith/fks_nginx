@@ -1,9 +1,16 @@
+# Documentation and scripts (not needed in image)
 *.md
 *.sh
 LICENSE
+
+# Logs (created at runtime)
 logs/
 *.log
+
+# SSL certificates (mounted as volumes, not copied)
 ssl/*.key
 ssl/*.crt
 !ssl/.gitkeep
+
+# Note: nginx.conf and conf.d/ are needed for Dockerfile.nginx, so not excluding them
 
