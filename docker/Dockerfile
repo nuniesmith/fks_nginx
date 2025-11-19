@@ -7,6 +7,8 @@ RUN rm -rf /etc/nginx/conf.d/default.conf
 # Copy custom nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY conf.d/ /etc/nginx/conf.d/
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 # Create directories for SSL certificates and logs
 RUN mkdir -p /etc/nginx/ssl \
@@ -24,6 +26,6 @@ EXPOSE 80 443
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost/health || exit 1
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start via entrypoint to inject dashboard token if mounted
+ENTRYPOINT ["/entrypoint.sh"]
 

@@ -2,13 +2,15 @@ services:
   nginx:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
     image: nuniesmith/fks:nginx-latest
     container_name: fks-nginx
     restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       # SSL certificates
       - ./ssl:/etc/nginx/ssl:ro
@@ -20,6 +22,8 @@ services:
       - ../web/media:/app/media:ro
       # Let's Encrypt certificates (if using certbot)
       - certbot_data:/etc/letsencrypt:ro
+      # Kubernetes dashboard token (created by run.sh option 6)
+      - ../main/k8s/dashboard-token.txt:/etc/nginx/secrets/dashboard-token.txt:ro
     networks:
       - fks-network
     depends_on:
@@ -27,6 +31,8 @@ services:
       - flower
     environment:
       - TZ=UTC
+      # Optional: override token via env (takes precedence over file if set)
+      - DASHBOARD_TOKEN=${DASHBOARD_TOKEN:-}
     labels:
       - "com.fks.service=nginx"
       - "com.fks.role=reverse-proxy"
