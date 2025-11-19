@@ -1,17 +1,18 @@
 name: CI
 
 on:
-    push:
-        branches: [main, master, develop]
-    pull_request:
-        branches: [main, master]
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master]
 
 jobs:
-    ci:
-        uses: nuniesmith/fks_actions/.github/workflows/ci-infra-service.yml@main
-        with:
-            service_name: nginx
-            service_port: 80
-            validate_config: false
-        secrets:
-            DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
+  ci:
+    uses: nuniesmith/fks_actions/.github/workflows/ci-infra-service.yml@main
+    with:
+      service_name: nginx
+      service_port: 80
+      validate_config: false
+      dockerfile_path: './docker/Dockerfile'
+    secrets:
+      DOCKER_TOKEN: ${{ secrets.DOCKER_TOKEN }}
