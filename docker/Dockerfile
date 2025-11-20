@@ -1,6 +1,9 @@
 # Nginx Reverse Proxy for FKS Trading Platform
 FROM nginx:1.25-alpine
 
+# Install gettext for envsubst (environment variable substitution)
+RUN apk add --no-cache gettext
+
 # Remove default nginx config
 RUN rm -rf /etc/nginx/conf.d/default.conf
 

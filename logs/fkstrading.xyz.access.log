@@ -1,0 +1,1 @@
+::1 - - [20/Nov/2025:14:47:40 +0000] "GET / HTTP/1.1\x5Cr\x5CnHost: k8s.fkstrading.xyz\x5Cr\x5Cn\x5Cr\x5Cn" 400 150 "-" "-" "-" rt=0.000 uct="-" uht="-" urt="-"

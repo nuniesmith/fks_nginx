@@ -26,9 +26,9 @@ services:
       - ../main/k8s/dashboard-token.txt:/etc/nginx/secrets/dashboard-token.txt:ro
     networks:
       - fks-network
-    depends_on:
-      - web
-      - flower
+    # Note: Services are in separate docker-compose files but share fks-network
+    # Ensure web service (fks_web) is running before starting nginx
+    # depends_on only works within the same compose file, so we rely on network connectivity
     environment:
       - TZ=UTC
       # Optional: override token via env (takes precedence over file if set)
