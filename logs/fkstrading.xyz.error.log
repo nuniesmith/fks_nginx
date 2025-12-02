@@ -1,0 +1,1 @@
+2025/11/27 18:51:47 [error] 14#14: *88 connect() failed (111: Connection refused) while connecting to upstream, client: 100.65.44.49, server: fkstrading.xyz, request: "POST /login/ HTTP/2.0", upstream: "http://172.18.0.9:8000/login/", host: "fkstrading.xyz", referrer: "https://fkstrading.xyz/login/?next=/dashboard/"

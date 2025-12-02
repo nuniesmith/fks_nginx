@@ -26,8 +26,8 @@ RUN mkdir -p /etc/nginx/ssl \
 EXPOSE 80 443
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost/health || exit 1
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider --timeout=3 --no-check-certificate https://localhost/health 2>/dev/null || exit 1
 
 # Start via entrypoint to inject dashboard token if mounted
 ENTRYPOINT ["/entrypoint.sh"]
