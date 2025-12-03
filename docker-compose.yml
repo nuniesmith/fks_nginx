@@ -15,7 +15,7 @@ services:
       # SSL certificates
       - ./ssl:/etc/nginx/ssl:ro
       # Logs
-      - ./logs:/var/log/nginx
+      #- ./logs:/var/log/nginx
       # Static files from Django (if running locally)
       - ../web/staticfiles:/app/staticfiles:ro
       # Media files from Django (if running locally)
@@ -30,7 +30,7 @@ services:
     # Ensure web service (fks_web) is running before starting nginx
     # depends_on only works within the same compose file, so we rely on network connectivity
     environment:
-      - TZ=UTC
+      - TZ=American/Toronto
       # Optional: override token via env (takes precedence over file if set)
       - DASHBOARD_TOKEN=${DASHBOARD_TOKEN:-}
     labels:
