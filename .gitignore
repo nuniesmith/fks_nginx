@@ -1,1 +1,7 @@
 .cursor
+*.log
+logs/access.log
+logs/crypto.fkstrading.xyz.access.log
+logs/crypto.fkstrading.xyz.error.log
+logs/fkstrading.xyz.access.log
+logs/fkstrading.xyz.error.log
